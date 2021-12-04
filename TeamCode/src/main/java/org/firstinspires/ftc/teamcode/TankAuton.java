@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "testAuton", group = "test")
+@Autonomous(name = "testTankAuton", group = "test")
 public class TankAuton extends LinearOpMode {
     ElapsedTime runtime = new ElapsedTime();
     IMUController imuController = null;

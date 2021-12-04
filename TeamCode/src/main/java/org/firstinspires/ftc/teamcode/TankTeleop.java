@@ -8,12 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "test Tank", group = "TeleOp")
 public class TankTeleop extends OpMode {
 
-//    public class DriveTank extends TankDrive {
-//
-//    }
-
     boolean carouselDirection = true;
-    float armPower = 1;
 
     ElapsedTime runtime = new ElapsedTime();
     CustomMotor[] motors = {
@@ -45,8 +40,8 @@ public class TankTeleop extends OpMode {
         motors[2].motor.setDirection(DcMotorEx.Direction.FORWARD);
         motors[3].motor.setDirection(DcMotorEx.Direction.FORWARD);
         motors[4].motor.setDirection(DcMotorEx.Direction.REVERSE);
-        motors[5].motor.setDirection(DcMotorEx.Direction.REVERSE);
-        motors[6].motor.setDirection(DcMotorEx.Direction.FORWARD);
+        motors[5].motor.setDirection(DcMotorEx.Direction.FORWARD);
+        motors[6].motor.setDirection(DcMotorEx.Direction.REVERSE);
 
         //Motor Zero Power Behavior
         motors[0].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -85,8 +80,8 @@ public class TankTeleop extends OpMode {
             }
         }
 
-        double y = -gamepad1.left_stick_y; //forward
-        double r = gamepad1.right_stick_x; //turn
+        double r = -gamepad1.left_stick_y; //forward
+        double y = gamepad1.right_stick_x; //turn
 
         //Individual Wheel Velocity
         double[] velocity = {
@@ -102,6 +97,7 @@ public class TankTeleop extends OpMode {
                 highestValue = Math.abs(ix);
             }
         }
+
         if (highestValue > 1) {
             for (double ix : velocity) {
                 ix /= highestValue;
@@ -110,35 +106,34 @@ public class TankTeleop extends OpMode {
 
         //Velocity Multiplier, Motor RPM
         for (int i = 0; i < 4; i++) {
-            motors[i].motor.setVelocity(velocity[i]*5000*velocityMultiplier);
+            motors[i].motor.setPower(velocity[i]);
         }
 
         //Carousel
         if(gamepad1.right_bumper){
             carouselDirection = !carouselDirection;
-            motors[4].motor.setPower(0.4);
+            motors[4].motor.setPower(0.25);
         } else if (gamepad1.left_bumper) {
-            motors[4].motor.setPower(-0.4);
+            motors[4].motor.setPower(-0.25);
         } else {
             motors[4].motor.setPower(0);
         }
 
         //Rotating Arm
-        if (gamepad2.right_trigger == armPower) {
-            motors[5].motor.setPower(0.3);
-        } else if (gamepad2.left_trigger == armPower) {
-            motors[5].motor.setPower(-0.3);
+        if(Math.abs(gamepad2.right_stick_y) > 0){
+            telemetry.addData("arm", gamepad2.right_stick_y);
+            motors[5].motor.setVelocity(gamepad2.right_stick_y*2500);
         } else {
             motors[5].motor.setPower(0);
         }
 
         //Intake
         if (gamepad2.right_bumper) {
-            motors[6].motor.setPower(1.0);
+            motors[6].motor.setVelocity(3000);
         } else if (gamepad2.left_bumper) {
-            motors[6].motor.setPower(-0.3);
+            motors[6].motor.setPower(-1);
         } else {
-            motors[6].motor.setPower(0);
+            motors[6].motor.setVelocity(0);
         }
 
         //Captions, Information Display
@@ -149,7 +144,7 @@ public class TankTeleop extends OpMode {
         telemetry.addData("BACK LEFT Motor",    motors[2].motor.getVelocity() + "rps");
         telemetry.addData("BACK RIGHT Motor",   motors[3].motor.getVelocity() + "rps");
         telemetry.addData("Carousel",           motors[4].motor.getVelocity() + "rps");
-        telemetry.addData("Rotating Arm",       motors[5].motor.getVelocity() + "rps");
+        telemetry.addData("Rotating Arm",       motors[5].motor.getPower() + "rps");
         telemetry.addData("Intake",             motors[6].motor.getVelocity() + "rps");
 
         telemetry.update();
