@@ -34,6 +34,7 @@ public class TankTeleop extends OpMode {
         motors[5].motor = hardwareMap.get(DcMotorEx.class, "rotating Arm");
         motors[6].motor = hardwareMap.get(DcMotorEx.class, "intake");
 
+
         //Motor Direction
         motors[0].motor.setDirection(DcMotorEx.Direction.FORWARD);
         motors[1].motor.setDirection(DcMotorEx.Direction.FORWARD);
