@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "testTankAutonBlue", group = "test")
-public class TankAuton extends LinearOpMode {
+@Autonomous(name = "testTankAutonRed", group = "test")
+public class TankAuto2 extends LinearOpMode {
     ElapsedTime runtime = new ElapsedTime();
     IMUController imuController = null;
     CustomMotor[] motors = {
@@ -75,6 +75,17 @@ public class TankAuton extends LinearOpMode {
             telemetry.addData("finished", finished);
             telemetry.update();
         } while(opModeIsActive() && !finished);
+         start = runtime.seconds();
+         finished = false;
+        do{
+            telemetry.addData("time", runtime.toString());
+            telemetry.addData("nan", runtime.nanoseconds());
+            telemetry.addData("seconds",runtime.seconds());
+
+            finished = AutonMethods.Move(motors,-0.3,0,runtime.seconds(), start, 1.7);
+            telemetry.addData("finished", finished);
+            telemetry.update();
+        } while(opModeIsActive() && !finished);
         start = runtime.seconds();
         finished = false;
         do{
@@ -82,7 +93,7 @@ public class TankAuton extends LinearOpMode {
             telemetry.addData("nan", runtime.nanoseconds());
             telemetry.addData("seconds",runtime.seconds());
 
-            finished = AutonMethods.carousel2(motors,runtime.seconds(), start, 10);
+            finished = AutonMethods.carousel(motors,runtime.seconds(), start, 10);
             telemetry.addData("finished", finished);
             telemetry.update();
         } while(opModeIsActive() && !finished);
