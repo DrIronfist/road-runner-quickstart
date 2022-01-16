@@ -1,14 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "test Tank", group = "TeleOp")
 public class TankTeleop extends OpMode {
-
+    double armTicks = 286.2*28.0;
     boolean carouselDirection = true;
 
     ElapsedTime runtime = new ElapsedTime();
@@ -18,6 +20,10 @@ public class TankTeleop extends OpMode {
     double timeLastPressed = 0;
     boolean pressed = false;
     double velocityMultiplier = 1;
+    double tickTolerance = 90;
+    double carouselPos = 0.5;
+
+
     @Override
     public void init() {
         leftCarousel = hardwareMap.get(Servo.class, "leftCarousel");
@@ -56,8 +62,23 @@ public class TankTeleop extends OpMode {
         motors[3].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
         motors[4].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
         motors[5].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
+//        motors[4].motor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//        motors[4].motor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
     }
+
+//    void rotateDegrees(double angle){
+//        if(!motors[4].motor.isBusy()){
+//            motors[4].motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            motors[4].motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            motors[4].motor.setTargetPosition((int)(angle/360.0+motors[4].motor.getCurrentPosition()));
+//            motors[4].motor.setTargetPositionTolerance((int)tickTolerance);
+//            motors[4].motor.setPower(1);
+//        }
+//
+//
+//    }
+
     @Override
     public void start() {
         runtime.reset();
@@ -66,9 +87,9 @@ public class TankTeleop extends OpMode {
     public void loop() {
         //Velocity Multiplier
 
-        if(pressed&& !gamepad1.right_bumper) {
+        if(pressed&& !gamepad1.a) {
             pressed = false;
-        } else if(pressed && gamepad1.right_bumper && runtime.time() - timeLastPressed > 0.25){
+        } else if(pressed && gamepad1.a && runtime.time() - timeLastPressed > 0.35){
             if (velocityMultiplier == 1) {
                 velocityMultiplier = 0.2;
             } else {
@@ -80,7 +101,7 @@ public class TankTeleop extends OpMode {
             gamepad1.rumble(100);
         }
 
-        if (gamepad1.right_bumper) {
+        if (gamepad1.a) {
             if(!pressed){
                 pressed = true;
                 timeLastPressed = runtime.time();
@@ -122,16 +143,15 @@ public class TankTeleop extends OpMode {
             leftCarousel.setPosition(1);
             rightCarousel.setPosition(1);
         } else if (gamepad1.left_bumper) {
-            leftCarousel.setPosition(-1);
-            rightCarousel.setPosition(-1);
-        } else {
             leftCarousel.setPosition(0);
             rightCarousel.setPosition(0);
+        } else {
+            leftCarousel.setPosition(0.5);
+            rightCarousel.setPosition(0.5);
         }
 
         //Rotating Arm
         if(Math.abs(gamepad2.right_stick_y) > 0){
-            telemetry.addData("arm", gamepad2.right_stick_y);
             motors[4].motor.setVelocity(gamepad2.right_stick_y*2500);
         } else {
             motors[4].motor.setPower(0);
@@ -154,8 +174,8 @@ public class TankTeleop extends OpMode {
         telemetry.addData("BACK LEFT Motor",    motors[2].motor.getVelocity() + "rps");
         telemetry.addData("BACK RIGHT Motor",   motors[3].motor.getVelocity() + "rps");
         telemetry.addData("Carousel",           motors[4].motor.getVelocity() + "rps");
-        telemetry.addData("Rotating Arm",       motors[5].motor.getPower() + "rps");
-        telemetry.addData("Intake",             motors[6].motor.getVelocity() + "rps");
+        telemetry.addData("Rotating Arm power",       motors[4].motor.getPower() + "rps");
+        telemetry.addData("rotating arm position", motors[4].motor.getCurrentPosition());
 
         telemetry.update();
     }
