@@ -45,7 +45,7 @@ public class CameraDetectionTest extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.3f;//oof
+        tfodParameters.minResultConfidence = 0.3f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 320;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
@@ -61,7 +61,7 @@ public class CameraDetectionTest extends LinearOpMode {
         }
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
-
+        int level = 0;
         waitForStart();
         while (opModeIsActive()) {
             if (tfod != null) {
@@ -70,9 +70,21 @@ public class CameraDetectionTest extends LinearOpMode {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                 if (updatedRecognitions != null) {
                     if(updatedRecognitions.size() > 0){
-
+                        Recognition last = updatedRecognitions.get(updatedRecognitions.size()-1);
+                        if(last.getLabel().equals("Duck")){
+                            double midX = (double)((last.getRight() - last.getLeft())/2+last.getLeft());
+                            if(midX <= firstLine){
+                                level = 1;
+                            } else if(midX <= secondLine){
+                                level = 2;
+                            } else{
+                                level = 3;
+                            }
+                        }
                     }
+                    telemetry.addData("level detected", level);
                     telemetry.addData("# Object Detected", updatedRecognitions.size());
+
 
                     // step through the list of recognitions and display boundary info.
                     int i = 0;
